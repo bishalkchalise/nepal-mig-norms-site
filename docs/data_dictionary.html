@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data dictionary — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html" aria-current="page">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="data-dictionary">Data dictionary</h1>
+<p>Every variable that enters a displayed result, grouped by source. Variable names are
+those in the cleaned files under <code>mig-gendered-norms/data/clean/</code> (read-only inputs) or
+derived in <code>clean/analysis/</code>. DHS item codes refer to the standard recode.</p>
+<h2 id="permits-and-shares-permits">Permits and shares {#permits}</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Definition</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>permits</code></td>
+<td>labour permits issued to residents of district <em>p</em> for destination <em>d</em> in a calendar year, by sex</td>
+<td><code>data/raw/migration/foreign_migration_district_country_annual.csv</code> (DoFE), 2009–2024</td>
+</tr>
+<tr>
+<td><code>share</code> (<code>s_pd</code>)</td>
+<td>permits_pd / Σ_d permits_pd over the share window, India and unmapped destinations excluded; re-normalised within shifter coverage</td>
+<td><code>clean/data/derived/shares.csv</code></td>
+</tr>
+<tr>
+<td><code>M</code></td>
+<td>annual-average non-India permits per 1,000 residents (2011 Census population) over the window</td>
+<td><code>clean/data/derived/intensity.csv</code></td>
+</tr>
+<tr>
+<td><code>iqr_m</code></td>
+<td>inter-quartile range of <code>M</code> across the 75 districts, per window × channel</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>channel</code></td>
+<td>total / male / female permits</td>
+<td>—</td>
+</tr>
+<tr>
+<td>census_2001 shares</td>
+<td>2001 Census absentee members abroad by country (India excluded); intensity = absentees per 1,000 (2011 pop.)</td>
+<td><code>data/clean/migration/shares_census2001.rds</code>, <code>intensity_census2001.rds</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="shifters-shifters">Shifters {#shifters}</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Definition</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wbl</code></td>
+<td>WBL 1.0 composite (0–100)</td>
+<td><code>data/clean/migration/wbl_country_year_wide.csv</code> (World Bank WBL 1971–2024)</td>
+</tr>
+<tr>
+<td><code>wbl_working_age</code></td>
+<td>mean of gr1 mobility, gr2 workplace, gr3 pay, gr4 marriage, gr5 parenthood, gr6 entrepreneurship, gr7 assets</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>unvaw</code> (<code>vaw</code>)</td>
+<td>UN Women VAW policy-measures index (0–100)</td>
+<td><code>data/clean/migration/vaw_policy_country_year_wide.rds</code> (1995–2025)</td>
+</tr>
+<tr>
+<td><code>W_bar</code></td>
+<td>Σ_d s_pd W_{d,t−2} over covered destinations</td>
+<td><code>clean/data/derived/exposure.csv</code></td>
+</tr>
+<tr>
+<td><code>W_std</code></td>
+<td><code>W_bar</code> standardised over the district × year panel 2001–2026 within window × channel × shifter</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>Z</code></td>
+<td><code>M × W_std</code> (the exposure / "instrument")</td>
+<td>same</td>
+</tr>
+<tr>
+<td><code>W_lead_std</code>, <code>Z_lead</code></td>
+<td>same with W_{d,t+2} (placebo), standardised with the lag moments</td>
+<td>same</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="destination-controls-controls">Destination controls {#controls}</h2>
+<p>Share-weighted, lagged two years, standardised across the district × year panel, one set
+per channel (<code>dc_&lt;var&gt;_&lt;channel&gt;</code>): <code>gdp_pc</code> (log GDP per capita, constant USD),
+<code>unemp_total</code>, <code>female_lfp</code>, <code>parl_female</code> (women in parliament, %), <code>fertility</code> (TFR),
+<code>educ_spend</code> (% GDP), <code>resource_rent</code> (% GDP). Source: WDI via
+<code>data/clean/migration/destination_controls.rds</code>. Population: <code>district_pop_2011.csv</code>
+(2011 Census); LG population 2021 for INSEC offsets (<code>pop_lg</code>, <code>lpop</code>).</p>
+<h2 id="dhs-womens-recode-dhs-women">DHS women's recode {#dhs-women}</h2>
+<p>Identifiers and controls: <code>survey_year</code>; <code>dist75_code</code> (75-district code from <code>sdist</code>/<code>sdistr</code>
+via <code>normalize_dist()</code>); <code>region5</code> (development region from code ranges 1–14, 15–34,
+35–49, 50–61, 62–75); <code>weight</code> = v005/10⁶; <code>dv_weight</code> = d005/10⁶; <code>age</code> v012; <code>educ_years</code>
+v133; <code>urban</code> v025; <code>wealth_q</code> v190 (absent 2001 → <code>wealth_q_f</code> = 0 "not collected");
+<code>marital_status</code> v501 (1 = currently married); <code>husband_is_away</code> (v504/v034/s704a
+composite); <code>literacy</code> v155.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>DHS item</th>
+<th>Definition</th>
+<th>Universe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wb_goesout, wb_neglects, wb_argues, wb_refusessex, wb_burnsfood</code></td>
+<td>v744a–e</td>
+<td>beating justified in situation = 1</td>
+<td>all women (2011 excluded)</td>
+</tr>
+<tr>
+<td><code>wb_any</code></td>
+<td>v744a–e</td>
+<td>any item = 1</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>wb_index</code></td>
+<td>derived</td>
+<td>standardised mean of the five items within the estimation sample</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>dv_phys_12m, dv_sex_12m, dv_emo_12m, dv_phys_sev_12m</code></td>
+<td>d105a–f, d105h–k, d103a–c</td>
+<td>often/sometimes in last 12 months</td>
+<td>ever-married, DV module</td>
+</tr>
+<tr>
+<td><code>dv_spousal_any_12m</code></td>
+<td>derived</td>
+<td>any of the three</td>
+<td>ever-married, DV module</td>
+</tr>
+<tr>
+<td><code>ipv_12m_index</code></td>
+<td>derived</td>
+<td>standardised mean of phys/sex/emo 12m</td>
+<td>ever-married, DV module</td>
+</tr>
+<tr>
+<td><code>dv_ever_phys_any, dv_emo_ever, dv_sex_ever</code></td>
+<td>d106/d107, d104, d108</td>
+<td>ever</td>
+<td>ever-married, DV module</td>
+</tr>
+<tr>
+<td><code>ctrl_any, ctrl_3plus</code></td>
+<td>d101a–e</td>
+<td>≥1 / ≥3 controlling behaviours</td>
+<td>ever-married, DV module</td>
+</tr>
+<tr>
+<td><code>auton_health, auton_bigpurch, auton_visit</code></td>
+<td>v743a, b, d</td>
+<td>respondent alone or jointly decides</td>
+<td>currently married</td>
+</tr>
+<tr>
+<td><code>auton_all3</code></td>
+<td>derived</td>
+<td>all three</td>
+<td>currently married</td>
+</tr>
+<tr>
+<td><code>decision_index</code></td>
+<td>derived</td>
+<td>standardised mean of the three</td>
+<td>currently married</td>
+</tr>
+<tr>
+<td><code>mob_permis, mob_money, mob_dist, mob_alone</code></td>
+<td>v467b, c, d, f</td>
+<td>"big problem" = 1</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>mobility_index</code></td>
+<td>derived</td>
+<td>standardised mean of the four, reversed (higher = fewer barriers)</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>employed</code></td>
+<td>v731</td>
+<td>worked in last 12 months</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>currently_working</code></td>
+<td>v714</td>
+<td>currently working</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>contracept_any, contracept_modern</code></td>
+<td>v313</td>
+<td>≥1 / = 3</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>children</code></td>
+<td>v201</td>
+<td>children ever born</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>currently_pregnant</code></td>
+<td>v213</td>
+<td></td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>ideal_n_children</code></td>
+<td>v613</td>
+<td>numeric responses</td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>ideal_son_preference</code></td>
+<td>v627 &gt; v628</td>
+<td></td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>age_at_marr</code>, <code>child_marriage</code></td>
+<td>v511, v511 &lt; 18</td>
+<td></td>
+<td>ever-married 20–49</td>
+</tr>
+<tr>
+<td><code>spouse_age_gap</code></td>
+<td>v730 − v012</td>
+<td></td>
+<td>currently married</td>
+</tr>
+<tr>
+<td><code>spouse_educ_gap</code></td>
+<td>v715 − v133</td>
+<td></td>
+<td>currently married</td>
+</tr>
+<tr>
+<td><code>literate_bin</code></td>
+<td>v155 ≥ 1</td>
+<td></td>
+<td>all women</td>
+</tr>
+<tr>
+<td><code>owns_land, owns_house</code></td>
+<td>v745a, v745b</td>
+<td>alone or jointly</td>
+<td>all women, 2011+</td>
+</tr>
+<tr>
+<td><code>daughter_school_share, son_school_share</code></td>
+<td>PR roster</td>
+<td>share of children 5–17 attending</td>
+<td>mothers with ≥1 such child</td>
+</tr>
+<tr>
+<td><code>school_gap_dm</code></td>
+<td>derived</td>
+<td>daughter − son attendance share</td>
+<td>mothers with ≥1 son and ≥1 daughter 5–17</td>
+</tr>
+<tr>
+<td><code>daughter_avg_years_school, son_avg_years_school</code></td>
+<td>PR roster</td>
+<td>mean completed years, 5–17</td>
+<td>as above</td>
+</tr>
+<tr>
+<td><code>daughter_attain_5y_share, son_attain_5y_share</code></td>
+<td>PR roster</td>
+<td>≥5 years among 10–17</td>
+<td>as above</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="dhs-mens-recode-dhs-men">DHS men's recode {#dhs-men}</h2>
+<p><code>mwb_goesout … mwb_burnsfood</code>, <code>mwb_any</code> (mv744a–e), <code>mwb_index</code> (derived); controls <code>age</code>,
+<code>educ_years</code>, <code>urban</code>, <code>wealth_q</code>; weight mv005/10⁶; district from <code>smdist</code>/<code>smdistr</code>.</p>
+<h2 id="household-roster-dhs-roster">Household roster {#dhs-roster}</h2>
+<p>Children aged 5–17 of the respondent (matched on cluster × household × mother line):
+attendance, completed years, by sex — aggregated to the mother as above.</p>
+<h2 id="insec-insec">INSEC {#insec}</h2>
+<p><code>sv68_panel.csv</code> (LG × year, 68 non-office districts): <code>sv_all</code> (rape + attempted rape +
+sexual abuse), <code>sv_women</code> (18+), <code>sv_child</code> (&lt;18), <code>sv_rape</code>, <code>sv_attempt</code>, <code>sv_abuse</code>,
+<code>other_all</code> (non-gendered: killing, beating, injured, arrest, assembly, racial — reference
+category), <code>pop_lg</code>, <code>lpop</code>, <code>urban</code> (Nagarpalika/metropolitan = 1), <code>province</code>,
+<code>district</code>. Years 2020–2025 (2018–19 geocode incompletely).</p>
+<h2 id="courts-courts">Courts {#courts}</h2>
+<p><code>court_taxonomy_panel.csv</code> (district × year, 2016–2025, Nepali subject taxonomy):
+<code>divorce_all</code>, <code>alimony_all</code>, <code>marital_pkg</code>, <code>partition</code>, <code>rape</code>, <code>dv</code>, <code>polygamy</code>,
+<code>ref_commercial</code> (cheque dishonour, lending, banking, fraud, forgery — reference
+category), <code>unclassified</code>, <code>n_total</code>, <code>pop</code>, <code>lpop</code>, <code>province</code>.</p>
+<h2 id="result-fields">Result fields</h2>
+<p>See <code>website_schema.md</code>.</p>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

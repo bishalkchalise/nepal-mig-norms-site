@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identification notes — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html" aria-current="page">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="identification-notes">Identification notes</h1>
+<h2 id="the-object-being-estimated">The object being estimated</h2>
+<p>Both papers estimate reduced-form shift-share regressions of the Godlonton–Theoharides form:</p>
+<pre><code>Y_ipt = β Z_pt + γ W̃_pt + X'θ + α_p + δ_t + ε_ipt,   Z_pt = M_p × W̃_pt,
+W̃_pt = std[ Σ_d s_pd W_{d,t−2} ].
+</code></pre>
+<p><code>M_p</code> (baseline intensity) is absorbed by the district effects; <code>W̃_pt</code> enters in levels
+so that β is identified from the <em>interaction</em> of how migration-intensive a district is
+with how much its destination mix's index moved. β is the change in Y per additional
+permit per 1,000 residents at a one-SD higher destination index two years earlier.</p>
+<h2 id="two-ways-to-justify-it">Two ways to justify it</h2>
+<p><strong>Shares view (Goldsmith-Pinkham, Sorkin &amp; Swift 2020).</strong> The destination shares are the
+instrument; they must be uncorrelated with district-level shocks to Y conditional on FE
+and controls. Nepal's shares reflect historical recruitment networks; the main threat is
+that districts that send migrants to, say, Malaysia differ in trends from those sending to
+Qatar for reasons other than Malaysian legal reform. The Diagnostics page therefore shows
+balance of 2001 DHS district characteristics on exposure, leave-one-destination-out
+estimates and the destination-contribution decomposition.</p>
+<p><strong>Shocks view (Borusyak, Hull &amp; Jaravel 2022).</strong> Destination index changes must be
+as-good-as-random across destinations and numerous enough. Nepal's corridor is
+concentrated (effective number of destinations ≈ 3–5 per district; Malaysia, Qatar, Saudi
+Arabia, UAE, Kuwait dominate), so the shocks view is weak here — there are few independent
+shocks per year. This is the main reason we do not report BHJ/AKM shock-level inference
+and instead lean on the shares view, the lead-shifter placebo and the within-unit-year
+stacked design for administrative counts.</p>
+<h2 id="threats-in-order-of-importance">Threats, in order of importance</h2>
+<ol>
+<li><strong>Destination macro conditions.</strong> Legal-equality and anti-VAW indices co-move with
+   destination development; migrant earnings and labour demand change at the same time.
+   Full block adds share-weighted destination GDP, unemployment, female LFP, parliament,
+   fertility, education spending and resource rents (lagged, per channel).</li>
+<li><strong>Differential regional trends.</strong> Region × linear trend in the Full block. District
+   linear trends are deliberately not offered: with four to five waves they absorb most
+   of the identifying variation, and the legacy project found that "everything dies under
+   district trends" for the admin families.</li>
+<li><strong>Reporting and caseload effects (admin families).</strong> Level Poisson designs failed
+   their placebos repeatedly in the legacy analysis (male-victim and non-gendered
+   incidents moved too). The stacked design compares the gendered category with a
+   reference category <em>within</em> unit × year, absorbing anything that moves the whole
+   caseload. Stacked is the default; level with offset is kept as an alternative.</li>
+<li><strong>Anticipation / trends correlated with the destination mix.</strong> Lead placebo: the
+   exposure rebuilt with W_{t+2} should not predict Y.</li>
+<li><strong>Measurement breaks.</strong> 2011 DHS attitude items gated by a Nepal-specific screener;
+   2011 "ever" sexual-violence items fielded differently; INSEC subtype codes appearing
+   mid-panel; 29% of court cases missing the English label. Each is handled by exclusion
+   or by using the stable classification (Nepali labels; stable INSEC subtypes).</li>
+<li><strong>Concentration.</strong> Leave-one-out of the top eight destinations; Var(Z) decomposition.</li>
+<li><strong>Thin female channel.</strong> In the 2009–2011 window 25 of 75 districts have fewer than 50
+   female permits; the 2009–2012 default and the 2012–2015 / 2009–2015 windows are
+   offered. Female-channel estimates remain imprecise; the channel-equality test's
+   conclusion depends on the scaling (see HANDOVER §3a) — the IQR-scaled magnitudes are
+   stored alongside every estimate.</li>
+</ol>
+<h2 id="what-is-not-claimed">What is <em>not</em> claimed</h2>
+<p>No result on this site is labelled causal, robust or confirmed by the interface. The
+estimator labels are "reduced form", "2SLS", "stacked Poisson", etc. The 2SLS option
+instruments the only household treatment observed in every wave (husband currently
+away); its first stage is weak (F &lt; 1) because the destination index is not a
+migration-inducing shock, so 2SLS coefficients are shown for completeness only.</p>
+<h2 id="prepost-structure-by-family">Pre/post structure by family</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Pre</th>
+<th>Post</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DHS attitudes (women, men)</td>
+<td>2001, 2006</td>
+<td>2016, 2022</td>
+<td>2011 excluded</td>
+</tr>
+<tr>
+<td>DHS agency</td>
+<td>2001, 2006</td>
+<td>2011, 2016, 2022</td>
+<td>2011 usable</td>
+</tr>
+<tr>
+<td>DHS IPV</td>
+<td>—</td>
+<td>2016, 2022</td>
+<td>no module before 2011; 2011 excluded; <strong>no comparable pre-period</strong></td>
+</tr>
+<tr>
+<td>Gender-norms DHS families</td>
+<td>2001, 2006</td>
+<td>2011, 2016, 2022</td>
+<td>"post-window only" sample offered</td>
+</tr>
+<tr>
+<td>INSEC sexual violence</td>
+<td>—</td>
+<td>2020–2025</td>
+<td><strong>no comparable pre-period</strong></td>
+</tr>
+<tr>
+<td>Court filings</td>
+<td>—</td>
+<td>2016–2025</td>
+<td><strong>no comparable pre-period</strong></td>
+</tr>
+</tbody>
+</table></div>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

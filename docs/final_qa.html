@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Final QA report: V4 (Godlonton–Theoharides notation, single explorer), 2026-08-21 — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html" aria-current="page">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="final-qa-report-v4-godlontontheoharides-notation-single-explorer-2026-08-21">Final QA report: V4 (Godlonton–Theoharides notation, single explorer), 2026-08-21</h1>
+<p>Build <code>6ce1f0088083</code> (estimation run 2026-08-20T21:25:09, analysis commit <code>3fadff5739</code>).
+Checks: <code>scripts/build_site.py --strict</code> (config/result validation, link check), <code>scripts/qa_browser.py</code>
+(Playwright, 1440/1280/390 px: 149 checks, 0 failures), screenshots inspected at 1280 px, JSON vs R CSV
+comparison. Rows: violence 11,317 / gender norms 6,164
+(controls ladder: (1) Baseline (2) + Individual controls (3) + Regional trends (4) + Destination controls; reduced-form OLS only; administrative outcomes as OLS on rates per 100,000; shifters WBL composite/marriage/work and VAW composite/policy; paper 01 single channel, paper 02 total + gendered; Overview = title, author, plain abstract; Results = one explorer (dropdowns, annotated equation in MigRate × Index notation, compact ladder table with Mean and N per row); alternative samples now estimated for every share × index so no dropdown option is disabled by the sample choice; no Identification tab, diagnostics page linked from Results).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>V2 checklist item</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact titles/questions</td>
+<td>PASS</td>
+<td>landing: <em>Migration, Violence, and Gender Norms in Nepal</em> / <em>Two related research projects. One shared migration-exposure design.</em>; 01 Remitting Violence; 02 Gendered Diffusion of Norms; questions verbatim (config/site.yml)</td>
+</tr>
+<tr>
+<td>Method phrase/visual/equation driven</td>
+<td>PASS</td>
+<td>schematic; A/B/C objects (phrase → notation → equation → 4-line facts); equations list; controls-ladder and outcome-family tables; no paragraphs</td>
+</tr>
+<tr>
+<td>Share, shift, share-weighted exposure, migration-weighted exposure distinct</td>
+<td>PASS</td>
+<td>Method C shows <code>s_dp</code> / <code>Σ s W̃</code> / <code>M × Σ s W̃</code> side by side; Identification Q4–Q5 equations</td>
+</tr>
+<tr>
+<td>Main Results default; Explorer available</td>
+<td>PASS</td>
+<td>Results opens in Main; toggle; <code>?mode=explorer</code> deep links; Back/Forward switch modes</td>
+</tr>
+<tr>
+<td>Preferred spec explicit</td>
+<td>PASS</td>
+<td><code>config/specifications.yml: defaults</code> + <code>main_results.preferred_column</code>; rendered as the "Preferred specification" block</td>
+</tr>
+<tr>
+<td>Main shares = 2009–2012, 2012–2015, 2009–2015</td>
+<td>PASS</td>
+<td><code>primary: true</code> in shares.yml; explorer optgroup "Main share windows"</td>
+</tr>
+<tr>
+<td>Extra shares under robustness</td>
+<td>PASS</td>
+<td>optgroup "Additional robustness shares": 2009–2011, 2015–2019, 2001 census; Identification window plot labels "(robustness)"</td>
+</tr>
+<tr>
+<td>Coefficient plots use real results</td>
+<td>PASS</td>
+<td>all dot plots built from <code>results_*.json</code> rows (spec id in tooltip); no second source</td>
+</tr>
+<tr>
+<td>Data pages: curated descriptive visuals</td>
+<td>PASS</td>
+<td><code>descriptives.json</code> (R): sample table, annual permits, intensity histogram, destination shares (+ male/female in 02), shifter change bars/table/lines with WBL</td>
+</tr>
+<tr>
+<td>Paper 01 hierarchy</td>
+<td>PASS</td>
+<td>A norms → B agency → C experienced violence → D administrative (config <code>hierarchy</code>; overview flow; results blocks; explorer optgroups)</td>
+</tr>
+<tr>
+<td>DHS 2011 exclusion clear</td>
+<td>PASS</td>
+<td>Data: compact note "DHS 2011</td>
+</tr>
+<tr>
+<td>INSEC/court no comparable pre-period</td>
+<td>PASS</td>
+<td>"Comparable pre-period: not available — post-period exposure specification" on Results blocks, Method outcome table, notes</td>
+</tr>
+<tr>
+<td>Paper 02 hierarchy</td>
+<td>PASS</td>
+<td>A intergenerational (schooling) → B marriage/fertility → C roles</td>
+</tr>
+<tr>
+<td>"Who transmits norms?" prominent</td>
+<td>PASS</td>
+<td>section on 02 Results (main mode): Outcome</td>
+</tr>
+<tr>
+<td>Destination contribution uses actual calculations</td>
+<td>PASS</td>
+<td><code>diagnostics.json: contribution</code> = cov(Z_p,Z)/Var(Z) from the exposure panel</td>
+</tr>
+<tr>
+<td>Leave-one-destination-out from real regressions</td>
+<td>PASS</td>
+<td><code>diagnostics.json: loo</code> re-estimates (310 rows) with rebuilt exposure</td>
+</tr>
+<tr>
+<td>Tables economics-style, legible</td>
+<td>PASS</td>
+<td>(1)–(4) ladder, coef/SE rows, stars, N, mean column, FE/controls rows; 18 px base font</td>
+</tr>
+<tr>
+<td>No tiny fonts / dashboard aesthetic</td>
+<td>PASS</td>
+<td>one accent; smallest text 0.88 rem ≈ 15.8 px</td>
+</tr>
+<tr>
+<td>URL state / downloads</td>
+<td>PASS</td>
+<td>explorer URL state incl. <code>mode</code>; Back works; CSV + LaTeX downloads tested</td>
+</tr>
+<tr>
+<td>Equations match active specification</td>
+<td>PASS</td>
+<td>equation switches with channel/estimator; summary carries window/shifter</td>
+</tr>
+<tr>
+<td>No fabricated results</td>
+<td>PASS</td>
+<td>every number from R outputs; build validates ids/stars; "not yet estimated" where absent (census family)</td>
+</tr>
+<tr>
+<td>Existing empirical pipeline works</td>
+<td>PASS</td>
+<td><code>make results</code> re-run end-to-end with the new ladder block (violence 2.5 min, gender 2.5 min)</td>
+</tr>
+<tr>
+<td>GitHub Pages deployment</td>
+<td>PASS</td>
+<td>published from <code>nepal-mig-norms-site</code> via <code>scripts/publish_site.sh</code>; live QA re-run after publish</td>
+</tr>
+<tr>
+<td>Desktop 1440 / laptop 1280 / mobile</td>
+<td>PASS</td>
+<td>no horizontal overflow at any viewport; screenshots reviewed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Known limitations: Identification regression panels (LOO, placebo, clustering, balance) are computed at the default share × shifter only; 2SLS first stage is weak (F &lt; 8) and is shown for completeness; census family and FX shifter remain placeholders; the in-repo Pages workflow needs a <code>workflow</code>-scoped token to push.</p>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

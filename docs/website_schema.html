@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Website result schema — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html" aria-current="page">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="website-result-schema">Website result schema</h1>
+<p>All website assets are produced by <code>analysis/common/export_website.R</code> from
+<code>clean/data/derived/results_&lt;paper&gt;.csv</code> (written by <code>analysis/&lt;paper&gt;/estimate.R</code>) and
+live in <code>clean/data/website/</code> (copied to <code>site/data/</code> at build time). The website never
+parses displayed text; every number on every page comes from these files.</p>
+<h2 id="files">Files</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config.json</code></td>
+<td>every configuration list the front end needs: site/papers, shares, shifters, controls, treatments, samples, weights, estimators, defaults, outcome families per paper, build metadata</td>
+</tr>
+<tr>
+<td><code>results_violence.json</code>, <code>results_gender_norms.json</code></td>
+<td>compact column-oriented result rows (see below)</td>
+</tr>
+<tr>
+<td><code>results_&lt;paper&gt;.csv</code></td>
+<td>the same rows, one per line, all columns</td>
+</tr>
+<tr>
+<td><code>diagnostics.json</code></td>
+<td>exposure distribution, concentration, destination contributions, leave-one-out, lead placebo, clustering, balance, shifter-vs-macro (see <code>analysis/common/diagnostics.R</code>)</td>
+</tr>
+<tr>
+<td><code>descriptives.json</code></td>
+<td>Data-page descriptives: annual permits, destination shares, district intensity, shifter baseline/later/change + series, exposure points/histograms, DHS outcome means by wave, INSEC/court annual rates, sample table (see <code>analysis/common/descriptives.R</code>)</td>
+</tr>
+<tr>
+<td><code>build_meta.json</code></td>
+<td><code>build_id</code> (12 hex chars: md5 over the per-paper result-file hashes), <code>generated_at</code>, <code>git_commit</code>, per-paper row/spec counts and the set of option ids actually present</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="identifiers">Identifiers</h2>
+<ul>
+<li><code>config.json</code> also carries <code>ladder</code> (controls ladder order), <code>main_results</code> (<code>dhs_ladder</code>, <code>admin_ladder</code>, <code>preferred_column</code>), per-share <code>primary</code>, per-outcome <code>key</code>, per-paper <code>hierarchy</code>/<code>flow</code>.</li>
+<li><code>spec_id</code> = <code>{paper}.{family}.{share_id}.{shifter_id}.{treatment_id}.{control_id}.{sample_id}.{estimator}.{weight_id}</code> — readable and deterministic; e.g. <code>violence.dhs_ipv.flow_2009_2012.unvaw.total.full.main.rf.dhs</code>.</li>
+<li><code>result_id</code> = <code>{spec_id}.{outcome_id}.{term}</code>.</li>
+<li>URL state on Results pages uses the same ids: <code>results.html?outcome=&lt;family&gt;&amp;share=…&amp;shift=…&amp;treatment=…&amp;controls=&lt;block|compare&gt;&amp;sample=…&amp;estimator=…&amp;weight=…</code>.</li>
+</ul>
+<h2 id="row-fields">Row fields</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>paper</code></td>
+<td><code>violence</code> / <code>gender_norms</code></td>
+</tr>
+<tr>
+<td><code>spec_id</code>, <code>result_id</code></td>
+<td>as above</td>
+</tr>
+<tr>
+<td><code>estimator</code></td>
+<td><code>rf</code>, <code>ols</code>, <code>fs</code>, <code>iv</code> (DHS); <code>stacked</code>, <code>level</code> (admin)</td>
+</tr>
+<tr>
+<td><code>outcome_family</code>, <code>outcome_id</code>, <code>outcome_label</code></td>
+<td>family and outcome ids/labels from <code>config/outcomes_*.yml</code></td>
+</tr>
+<tr>
+<td><code>term</code>, <code>term_label</code></td>
+<td><code>Z_total</code>, <code>Z_male</code>, <code>Z_female</code>, or <code>husband_is_away</code> (ols/iv rows)</td>
+</tr>
+<tr>
+<td><code>share_id</code>, <code>shifter_id</code>, <code>treatment_id</code>, <code>control_id</code>, <code>sample_id</code>, <code>weight_id</code></td>
+<td>option ids</td>
+</tr>
+<tr>
+<td><code>fixed_effects</code>, <code>cluster</code>, <code>controls_label</code>, <code>weight_label</code>, <code>waves</code>, <code>reference_category</code></td>
+<td>human-readable specification metadata (stored once per <code>spec_id</code> in the JSON, repeated in the CSV)</td>
+</tr>
+<tr>
+<td><code>beta</code>, <code>se</code>, <code>p_value</code>, <code>stars</code>, <code>ci_low</code>, <code>ci_high</code></td>
+<td>point estimate, cluster-robust SE, p, stars (<code>*</code> p&lt;.10, <code>**</code> p&lt;.05, <code>***</code> p&lt;.01 — recomputed from p at export and verified at build), 95% CI with t(G−1) critical value</td>
+</tr>
+<tr>
+<td><code>n</code>, <code>n_clusters</code></td>
+<td>observations used by the fit; number of district clusters</td>
+</tr>
+<tr>
+<td><code>depvar_mean</code></td>
+<td>(weighted) mean of the dependent variable in the estimation sample</td>
+</tr>
+<tr>
+<td><code>iqr_m</code></td>
+<td>inter-quartile range of baseline intensity for the term's channel and window</td>
+</tr>
+<tr>
+<td><code>scaled_beta</code></td>
+<td><code>beta × iqr_m</code> (DHS: outcome units); admin: <code>100·(exp(beta × iqr_m) − 1)</code> (%)</td>
+</tr>
+<tr>
+<td><code>effect_pct</code></td>
+<td>admin only: <code>100·(exp(beta) − 1)</code></td>
+</tr>
+<tr>
+<td><code>p_channel_equality</code></td>
+<td>gendered treatment: p-value of β_male = β_female (t with G−1 df, clustered vcov)</td>
+</tr>
+<tr>
+<td><code>first_stage_coef</code>, <code>first_stage_se</code>, <code>first_stage_f</code>, <code>first_stage_f_robust</code>, <code>partial_r2</code></td>
+<td>iv/fs rows only: first-stage coefficient on the (first) instrument, conventional F (<code>ivf1</code>), cluster-robust Wald F (<code>ivwald1</code>), partial R² of the instruments</td>
+</tr>
+<tr>
+<td><code>unit</code></td>
+<td>outcome unit from config (share, SD, years, count, …)</td>
+</tr>
+<tr>
+<td><code>generated_at</code>, <code>git_commit</code></td>
+<td>time stamp and repository commit of the estimation run</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="compact-json-layout">Compact JSON layout</h2>
+<pre><code>{ &quot;paper&quot;: &quot;violence&quot;, &quot;generated_at&quot;: &quot;...&quot;, &quot;git_commit&quot;: &quot;...&quot;,
+  &quot;columns&quot;: [&quot;spec_id&quot;,&quot;estimator&quot;, ...],
+  &quot;spec_meta&quot;: { &quot;&lt;spec_id&gt;&quot;: {&quot;fixed_effects&quot;: &quot;...&quot;, &quot;cluster&quot;: &quot;...&quot;, ...}, ... },
+  &quot;rows&quot;: [[...], [...], ...] }
+</code></pre>
+<p><code>shared/js/results-core.js</code> expands it into row objects at load time.</p>
+<h2 id="guarantees-enforced-at-build-scriptsbuild_sitepy">Guarantees enforced at build (<code>scripts/build_site.py</code>)</h2>
+<ul>
+<li>every id in a result row exists in config;</li>
+<li>stars match p-values;</li>
+<li>every headline result configured in <code>config/site.yml</code> has a row at the paper's default specification;</li>
+<li>no violence outcome id appears in a gender-norms family;</li>
+<li>all internal links resolve; no local absolute paths in any page.</li>
+</ul>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

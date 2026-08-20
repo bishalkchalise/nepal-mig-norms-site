@@ -1,0 +1,43 @@
+{
+  "build_id": "49f310127da0",
+  "generated_at": "2026-08-21T00:21:28+1000",
+  "git_commit": "55d469e00dc26371550b23bc75815ee3788ae4d4",
+  "papers": {
+    "violence": {
+      "rows": 18930,
+      "specs": 2250,
+      "outcomes": 50,
+      "families": ["court", "dhs_agency", "dhs_attitudes", "dhs_ipv", "dhs_men_attitudes", "insec_sv"],
+      "md5": "b999f6021a717baca7ef0e7c83063288",
+      "generated_at": "2026-08-20 14:12:25",
+      "git_commit": "55d469e00dc26371550b23bc75815ee3788ae4d4",
+      "available": {
+        "shares": ["census_2001", "flow_2009_2011", "flow_2009_2012", "flow_2009_2015", "flow_2012_2015", "flow_2015_2019"],
+        "shifters": ["unvaw", "unvaw_policy", "wbl", "wbl_marriage", "wbl_work"],
+        "treatments": "total",
+        "controls": ["full", "minimal", "trends", "baseline"],
+        "samples": ["main", "no_ktm", "rural", "incl_2011"],
+        "estimators": ["ols_rate", "rf"],
+        "weights": ["none", "dhs"]
+      }
+    },
+    "gender_norms": {
+      "rows": 36480,
+      "specs": 3300,
+      "outcomes": 30,
+      "families": ["education", "fertility", "roles", "wellbeing_2022"],
+      "md5": "cc1748f24623fc6c4c81c09999b59f9d",
+      "generated_at": "2026-08-20 14:20:36",
+      "git_commit": "55d469e00dc26371550b23bc75815ee3788ae4d4",
+      "available": {
+        "shares": ["census_2001", "flow_2009_2011", "flow_2009_2012", "flow_2009_2015", "flow_2012_2015", "flow_2015_2019"],
+        "shifters": ["unvaw", "unvaw_policy", "wbl", "wbl_marriage", "wbl_work"],
+        "treatments": ["total", "gendered"],
+        "controls": ["baseline", "full", "minimal", "trends"],
+        "samples": ["main", "no_ktm", "post_base", "rural"],
+        "estimators": "rf",
+        "weights": "dhs"
+      }
+    }
+  }
+}

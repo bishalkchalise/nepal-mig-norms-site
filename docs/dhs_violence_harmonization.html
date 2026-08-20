@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DHS violence harmonisation — Nepal 1996–2022 — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html" aria-current="page">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="dhs-violence-harmonisation-nepal-19962022">DHS violence harmonisation — Nepal 1996–2022</h1>
+<p>Availability was established by loading the cleaned women's/men's recodes
+(<code>mig-gendered-norms/data/clean/dhs/np_dhs_all_rounds_{women,men}.rds</code>,
+<code>data/clean/analysis/analysis_{women,men}.rds</code>) and counting non-missing values by
+round, and by reading the extraction code (<code>script/var/01_dhs_women.R</code>,
+<code>02_dhs_men.R</code>). "Available" below means the item was asked to a comparable universe with
+comparable coding — not merely that a DHS file exists.</p>
+<p>Round sizes (women's recode): 1996 8,429 · 2001 8,726 · 2006 10,793 · 2011 12,674 ·
+2016 12,862 · 2022 14,845. <strong>1996 has no district identifier and is dropped from every
+analysis.</strong> The 1996 and 2001 women's recodes interview ever-married women only; 2006+
+interview all women 15–49.</p>
+<h2 id="a-attitudes-towards-wife-beating-v744ae-women-mv744ae-men">A. Attitudes towards wife-beating (v744a–e women; mv744a–e men)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>2001</th>
+<th>2006</th>
+<th>2011</th>
+<th>2016</th>
+<th>2022</th>
+<th>Coding</th>
+<th>Universe</th>
+<th>Comparability</th>
+<th>Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wb_goesout … wb_burnsfood (5 items)</td>
+<td>N≈8,720</td>
+<td>≈10,780</td>
+<td>12,674 <strong>(gated)</strong></td>
+<td>≈12,850</td>
+<td>≈14,825</td>
+<td>1 = beating justified</td>
+<td>all women in recode (2001: ever-married)</td>
+<td>2011: asked only to women answering "yes" to Nepal-specific screener <code>s824aa</code> "husband can hit or beat wife for any reason" (80 of 12,674); non-gated stored as 0 → wb_any mean 0.006 vs 0.19–0.29 elsewhere. Not a coding bug, an instrument break.</td>
+<td>2001, 2006, 2016, 2022</td>
+</tr>
+<tr>
+<td>wb_any</td>
+<td>8,724 (.291)</td>
+<td>10,785 (.242)</td>
+<td>12,674 (.006)</td>
+<td>12,862 (.285)</td>
+<td>14,845 (.191)</td>
+<td>any of five</td>
+<td>as above</td>
+<td>as above</td>
+<td>same</td>
+</tr>
+<tr>
+<td>wb_index (clean)</td>
+<td>rebuilt from the 5 items within the estimation sample</td>
+<td></td>
+<td>excluded</td>
+<td></td>
+<td></td>
+<td>standardised mean</td>
+<td></td>
+<td>legacy <code>wb_index_w</code> was <strong>not</strong> nulled for 2011 in <code>est/13_main.R</code> → the headline index regression there includes 2011</td>
+<td>same</td>
+</tr>
+<tr>
+<td>mwb_* (men)</td>
+<td>2,258 (.358)</td>
+<td>4,397 (.222)</td>
+<td><strong>110</strong> (.909)</td>
+<td>4,063 (.257)</td>
+<td>4,912 (.189)</td>
+<td>as women</td>
+<td>men 15–49</td>
+<td>2011 module reached 2.7% of men (<code>sm613a</code> gate)</td>
+<td>2001, 2006, 2016, 2022</td>
+</tr>
+</tbody>
+</table></div>
+<p>1996: no v744 items (the clean file carries <code>wb_count = 0</code> for 1996 — padding, not data).</p>
+<h2 id="b-experienced-violence-domestic-violence-module-d-variables-weight-d005">B. Experienced violence (domestic-violence module, d-variables; weight d005)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>2001</th>
+<th>2006</th>
+<th>2011</th>
+<th>2016</th>
+<th>2022</th>
+<th>Coding</th>
+<th>Universe</th>
+<th>Comparability</th>
+<th>Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dv_subsample (module)</td>
+<td>—</td>
+<td>—</td>
+<td>4,197</td>
+<td>4,444</td>
+<td>5,178</td>
+<td>1 woman/household selected</td>
+<td>all women in selected HHs</td>
+<td>module exists 2011+ only</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_phys_12m / dv_sex_12m / dv_emo_12m</td>
+<td>—</td>
+<td>—</td>
+<td>3,505 (.116/.089/.112)</td>
+<td>3,826 (.100/.048/.078)</td>
+<td>4,523 (.105/.042/.096)</td>
+<td>d105<em>/d103</em> frequency codes 1–2</td>
+<td>ever-married in module</td>
+<td>12-month items reproduce DHS final reports in all three rounds</td>
+<td>2016, 2022 (2011 in <code>incl_2011</code> sample only)</td>
+</tr>
+<tr>
+<td>dv_phys_sev_12m</td>
+<td>—</td>
+<td>—</td>
+<td>3,505 (.054)</td>
+<td>3,826 (.045)</td>
+<td>4,523 (.042)</td>
+<td>d105d–f</td>
+<td>ever-married</td>
+<td>comparable</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_ever_phys_any</td>
+<td>—</td>
+<td>—</td>
+<td>3,505 (.234)</td>
+<td>3,826 (.220)</td>
+<td>4,523 (.219)</td>
+<td>d106/d107</td>
+<td>ever-married</td>
+<td>within ~1pp of reports</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_emo_ever</td>
+<td>—</td>
+<td>—</td>
+<td>3,505 (.175)</td>
+<td>3,826 (.127)</td>
+<td>4,523 (.124)</td>
+<td>d104</td>
+<td>ever-married</td>
+<td>comparable</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_sex_ever</td>
+<td>—</td>
+<td>—</td>
+<td>3,505 (.147)</td>
+<td>3,826 (.078)</td>
+<td>4,523 (.071)</td>
+<td>d108</td>
+<td>ever-married</td>
+<td><strong>2011 fielded sexual "ever" items differently</strong> (<code>var/01</code> l.158–160) — 2011 level not comparable</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_spousal_any_12m / _ever</td>
+<td>—</td>
+<td>—</td>
+<td>3,505</td>
+<td>3,826</td>
+<td>4,523</td>
+<td>any of phys/sex/emo</td>
+<td>ever-married</td>
+<td>as components</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_phys_any_ever / dv_sex_any_ever (any perpetrator)</td>
+<td>—</td>
+<td>—</td>
+<td>4,197</td>
+<td>4,444</td>
+<td>5,178</td>
+<td>d115<em>/d125</em></td>
+<td>all module women</td>
+<td>comparable</td>
+<td>available (not in main table)</td>
+</tr>
+<tr>
+<td>ctrl_jealous … ctrl_location (5 items), ctrl_any, ctrl_3plus</td>
+<td>—</td>
+<td>—</td>
+<td>3,505</td>
+<td>3,826</td>
+<td>4,523</td>
+<td>d101a–e ≥ 1</td>
+<td>ever-married</td>
+<td>2022 switches to frequency codes (handled with ≥1); <code>ctrl_money</code> (d101f) 2011 only — excluded</td>
+<td>2016, 2022</td>
+</tr>
+<tr>
+<td>dv_viol_pregnancy</td>
+<td>—</td>
+<td>—</td>
+<td>3,293</td>
+<td>3,617</td>
+<td>4,183</td>
+<td>d118y = 0</td>
+<td>ever-pregnant</td>
+<td>comparable</td>
+<td>available</td>
+</tr>
+<tr>
+<td>injuries (d110<em>), help-seeking (d119</em>), father beat mother (d121)</td>
+<td>—</td>
+<td>—</td>
+<td>raw only</td>
+<td>raw only</td>
+<td>raw only</td>
+<td>not extracted</td>
+<td></td>
+<td></td>
+<td>no</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Consequence.</strong> There is <strong>no pre-period for experienced IPV</strong>; the family is a 2016 → 2022
+within-district design. Labelled as such on the Results and Data pages. The 2011 wave can
+be added via the sample option <code>incl_2011</code>, which is marked "not preferred".</p>
+<h2 id="c-agency-empowerment-v743-v467">C. Agency / empowerment (v743, v467)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>2001</th>
+<th>2006</th>
+<th>2011</th>
+<th>2016</th>
+<th>2022</th>
+<th>Universe</th>
+<th>Comparability</th>
+<th>Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auton_health (v743a)</td>
+<td>8,726</td>
+<td>10,793</td>
+<td>9,460</td>
+<td>9,904</td>
+<td>11,258</td>
+<td>2001/06: all (ever-married) women; 2011+: currently married</td>
+<td>clean pipeline restricts to <strong>currently married</strong> in every wave</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auton_bigpurch (v743b)</td>
+<td>8,726</td>
+<td>10,793</td>
+<td>9,460</td>
+<td>9,904</td>
+<td>11,258</td>
+<td>as above</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auton_visit (v743d)</td>
+<td>8,726</td>
+<td>10,793</td>
+<td>9,460</td>
+<td>9,904</td>
+<td>11,258</td>
+<td>as above</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>auton_dailyneed (v743c)</td>
+<td>8,726</td>
+<td>10,793</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td></td>
+<td>dropped after 2006</td>
+<td>no</td>
+</tr>
+<tr>
+<td>auton_own_earn (v743e)</td>
+<td>8,726</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td></td>
+<td>the code labels v743e "own earnings"; DHS label is "food to be cooked" (2001)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>auton_husb_earn (v743f)</td>
+<td>—</td>
+<td>8,202</td>
+<td>9,389</td>
+<td>9,797</td>
+<td>11,134</td>
+<td></td>
+<td>absent 2001</td>
+<td>no (not comparable to pre)</td>
+</tr>
+<tr>
+<td>decision_index / auton_all3 (clean)</td>
+<td>from the three comparable items</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>currently married</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>mob_permis / money / dist / alone (v467b,c,d,f)</td>
+<td>8,726</td>
+<td>10,793</td>
+<td>12,674</td>
+<td>12,862</td>
+<td>14,845</td>
+<td>all women</td>
+<td>"big problem" = 1, stable wording</td>
+<td>yes (index reversed)</td>
+</tr>
+<tr>
+<td>employed (v731&gt;0), currently_working (v714)</td>
+<td>all rounds</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>all women</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr>
+<td>control over own earnings (v739), cash earnings (v741)</td>
+<td>raw only</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>not extracted</td>
+<td>no</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="d-wave-rule-applied-in-the-clean-pipeline">D. Wave rule applied in the clean pipeline</h2>
+<ul>
+<li>Attitudes (women, men): <strong>2001, 2006 | 2016, 2022</strong>.</li>
+<li>IPV experience and controlling behaviour: <strong>2016, 2022</strong> (post-only; 2011 optional, not preferred).</li>
+<li>Agency: 2001, 2006, 2011, 2016, 2022.</li>
+<li>Indices are rebuilt inside each estimation sample so that no wave with a gated or
+  missing item contributes padded zeros.</li>
+</ul>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

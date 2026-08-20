@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project audit (pre-build) — nepal-mig-norms — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html" aria-current="page">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="project-audit-pre-build-nepal-mig-norms">Project audit (pre-build) — nepal-mig-norms</h1>
+<p>Written 2026-08-20 before the <code>clean/</code> implementation. Everything below was
+verified by reading the repository (file paths and line numbers are given where
+the finding is non-obvious). The purpose is to record what existed, what was
+reused, what was left alone, and which empirical choices remain open.</p>
+<h2 id="1-existing-analysis-languages-and-structure">1. Existing analysis languages and structure</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Finding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Languages</td>
+<td>R (≈95 scripts; <code>fixest</code>, <code>data.table</code>, <code>dplyr</code>, <code>haven</code>), one Python geocoder (<code>script/build/11_court_geocode_parties.py</code>), one legacy Python estimator (<code>script/compute_estimates.py</code>, 23 Jun, superseded), Quarto for two review decks.</td>
+</tr>
+<tr>
+<td>Top-level layout</td>
+<td><code>mig-gendered-norms/</code> (active paper "Remitting Norms"; owns the DHS + exposure backbone) and <code>mig-vaw-norms/</code> (violence sibling, reads upstream clean data read-only). Nine dated exploratory folders under <code>mig-gendered-norms/</code> and three under <code>mig-vaw-norms/</code>.</td>
+</tr>
+<tr>
+<td>Pipeline order</td>
+<td><code>script/00_setup.R</code> (sourced) → <code>var/01–07</code> (raw → clean) → <code>build/07–10</code> (exposure) → <code>est/09–58</code> (estimation) → <code>out/17–22</code> (tables/figures).</td>
+</tr>
+<tr>
+<td>Config</td>
+<td><code>mig-gendered-norms/config/params.yml</code> exists but est scripts hard-code most knobs; its comments contradict each other on the primary share (l.25–27 vs l.28).</td>
+</tr>
+<tr>
+<td>Website</td>
+<td>None. No <code>index.html</code>, no <code>docs/</code> site, no GitHub Pages configuration for this repository (<code>gh api repos/…/pages</code> → 404). The repository is <strong>private</strong>. A sibling public repo (<code>nepal-rural-mig-modern-analysis</code>) deploys legacy Pages from <code>main:/docs</code>; the user site <code>bishalkchalise.github.io</code> is a personal page and was not touched.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="2-current-instruments-shares-and-shifters">2. Current instruments, shares and shifters</h2>
+<p><strong>Design.</strong> Reduced-form Godlonton–Theoharides shift-share, not a 2SLS: exposure <code>Z_pt = M_p × W̃_pt</code> with <code>M_p</code> = baseline permits per 1,000 (2011 population) and <code>W̃_pt</code> = standardised share-weighted destination index lagged two years; district + survey-year FE; DHS weights; district clusters.</p>
+<p><strong>Two non-interchangeable scalings coexist</strong> (see <code>CLAUDE.md</code>, <code>HANDOVER.md §3(a)</code>): <code>M_rate × W_std</code> in <code>est/13_main.R</code>, <code>13f</code>, <code>36</code>, <code>37</code> (the paper), and <code>M_p0_std × W_std</code> (z × z) in <code>build/07</code>, <code>est/09</code>, <code>13e</code>, <code>17</code>, and the admin scripts <code>41–56</code>. The clean pipeline uses <strong>only</strong> the paper scaling (<code>M_rate × W_std</code>, magnitude = β × IQR(M)).</p>
+<p><strong>Share variants found in code.</strong> Census-2001 absentees; DoFE permit windows 2009–2011 (primary), 2009–2010 (<code>est/37</code>), 2010–2013 (<code>est/39</code>), 2012–2015 and 2009–2015 (admin scripts <code>41–56</code>), 2013–2015 (<code>est/27</code>); 2013 stock (five district names fail to normalise — <code>acham, argakhanchi, dadeldhuda, tehrathum, udaypur</code> → missing population). <strong>2015–2019 did not exist anywhere.</strong></p>
+<p><strong>Shifter variants found.</strong> WBL 1.0 composite and eight domain scores (<code>var/04</code>); 7-domain working-age mean (<code>est/37</code>); outcome-matched domains (<code>est/36</code>); UN Women VAW policy index + variants full/lawpol/violemp (<code>var/04b</code>, <code>mig-vaw-norms/00_setup.R</code>); OECD SIGI (single wave, build skipped); V-Dem <code>v2x_gencl</code> (<code>mig-vaw-norms/17</code>); relative WBL <code>Σ s (WBL_d − WBL_NPL)</code> (<code>build/10</code>, output absent); lead/lag placebos (<code>LAG_OFFSETS = 0,−2,−4,+2</code>). WDI destination controls (7 series) are share-weighted and lagged (<code>build/09</code>). <strong>No exchange-rate series exists</strong>, so the Khanna et al. FX shifter is not constructed.</p>
+<p><strong>Treatment definitions.</strong> Headline: none (reduced form). <code>est/17_2sls.R</code> instruments <code>husband_is_away</code> with the male+female z×z shocks — the script was never run (its output file does not exist). Legacy <code>compute_estimates.py</code> instrumented <code>ann_mig_rate</code> with a 2001-share Bartik.</p>
+<h2 id="3-outcome-files-dhs-waves-admin-data">3. Outcome files, DHS waves, admin data</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DHS women</td>
+<td><code>data/clean/analysis/analysis_women.rds</code>: 59,900 × 261, waves 2001–2022 (1996 dropped: no district variable). DV module 2011/2016/2022 (4,197 / 4,444 / 5,178 women). Wife-beating items 2001, 2006, 2011 (gated), 2016, 2022. Wealth quintile absent in 2001. District key <code>dist75_code</code>.</td>
+</tr>
+<tr>
+<td>DHS men</td>
+<td><code>analysis_men.rds</code>: 19,755 × 115, 2001–2022; 2011 attitude module reached 110 men.</td>
+</tr>
+<tr>
+<td>DHS children / roster</td>
+<td>mother-level schooling of children 5–17 joined to women (2001–2022).</td>
+</tr>
+<tr>
+<td>INSEC</td>
+<td>victim microdata outside the repo (<code>data-clean/insec-hrv-data</code>); panels built in <code>insec_violence_2026-08-20/output/tables/</code> (district × year 2018–25; LG × year 2018–25; 68-district sexual-violence LG panel <code>sv68_panel.csv</code>). Subtype coding breaks documented there (dowry, femicide, polygamy).</td>
+</tr>
+<tr>
+<td>Courts</td>
+<td>cause lists outside the repo (<code>nepal-court-data</code>); panels in <code>court_filings_2026-08-20/output/tables/</code> (district × year 2016–25; Nepali-taxonomy panel <code>court_taxonomy_panel.csv</code>); English subject label missing for 29% of cases.</td>
+</tr>
+<tr>
+<td>Census</td>
+<td>2001 absentee shares and 2011 population only; <strong>no census outcome panel</strong> (female attainment, girls' schooling, women's work) exists.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-result-export-pipeline-before">4. Result-export pipeline (before)</h2>
+<p>Each <code>est/</code> script writes its own CSV with its own schema (<code>main_horse_race.csv</code>, <code>gt_*_results.csv</code>, <code>court_main_grid.csv</code>, <code>sv68_*</code>, …; ≈140 CSVs across folders). p-values and N are always present; dep-var means only in some; first-stage statistics only in the unrun <code>17_2sls.R</code>. No spec-id convention, no build hash, no single website-safe file. Two review decks hold "interactive cube" CSVs (<code>coauthor_review_deck_*/output/interactive_specification_results.csv</code>) that are the closest thing to a website export.</p>
+<h2 id="5-reusable-obsolete-and-duplicated-code">5. Reusable, obsolete and duplicated code</h2>
+<p><em>Reused (read-only) by the clean pipeline:</em> the cleaned DHS analysis files, <code>district_pop_2011</code>, <code>country_iso3_crosswalk</code>, <code>shares_census2001</code> / <code>intensity_census2001</code>, <code>wbl_country_year_wide</code>, <code>vaw_policy_country_year_wide</code>, <code>destination_controls</code>, the two admin panels above, and the helper logic of <code>normalize_dist()</code>, <code>district_lookup_75()</code>, <code>make_index()</code> (re-implemented verbatim in <code>clean/analysis/common/00_common.R</code> so that <code>clean/</code> has no <code>source()</code> dependency on upstream scripts).</p>
+<p><em>Obsolete:</em> <code>script/estimation.R</code> (hard-coded OneDrive paths, l.29/46), <code>script/compute_estimates.py</code>, <code>script/dhs_outcome.R</code>, <code>script/wbl_plot.R</code>; <code>mig-vaw-norms/script/16_altshifter_vaw_variants.R</code> (superseded); <code>mig-vaw-norms/script/18_relevant_vaw_index.R</code> is tracked but deleted in the working tree.</p>
+<p><em>Duplicated / ambiguous numbering:</em> <code>13_horse_race.R</code>/<code>13_main.R</code>, <code>15_robustness.R</code>/<code>15_main_robustness.R</code>, <code>11_event_study.R</code>/<code>22_event_study.R</code>, <code>13b_alt_shifters.R</code>/<code>13b_horse_race_extended.R</code>, <code>13c_subperiod_split.R</code>/<code>13c_violence_focus_vaw.R</code>. Left untouched (CLAUDE.md: do not modify <code>paper/</code>; exploratory work lives in dated folders).</p>
+<h2 id="6-inconsistencies-that-affected-the-clean-design">6. Inconsistencies that affected the clean design</h2>
+<ol>
+<li><strong>2011 wife-beating attitudes</strong> are gated by <code>s824aa</code> (0.8% yes) → <code>est/13_main.R</code> nulls the five items and <code>wb_any</code> but <strong>not</strong> <code>wb_index_w</code>, so the headline index regression in the legacy table includes 2011's near-zero values. Clean pipeline: 2011 excluded for all attitude outcomes; indices rebuilt.</li>
+<li><strong>Wealth quintile absent in 2001</strong> → the legacy complete-case controls silently dropped the 2001 wave (attitude regressions had N≈38k = 2006+2016+2022). Clean pipeline: wealth dummies with a "not collected" level absorbed by the 2001 wave effect.</li>
+<li><strong>Trend specification differs</strong> across headline scripts: region trends (<code>13_main</code>) vs district linear trends (<code>13f</code>, <code>36</code>, <code>37</code>). Clean pipeline: region linear trends in the Full block (district trends would absorb most of the five-wave variation).</li>
+<li><strong>p-value df for the channel test</strong> differs (<code>nobs − k</code> vs <code>G − 1</code>). Clean pipeline: <code>G − 1</code>.</li>
+<li><strong>Intensity scale across windows</strong>: legacy <code>M_p0</code> sums permits over the window, so longer windows mechanically inflate M. Clean pipeline: annual-average permits per 1,000 (β × IQR(M) is invariant either way).</li>
+<li><code>literate_bin</code> defined two ways (<code>&gt;= 1</code> vs <code>%in% c(1,2)</code>); clean uses <code>&gt;= 1</code> (reads part or whole sentence).</li>
+<li><code>hiv_stigma_index_w</code> is populated in 2001 although no stigma item exists (all-NA item replaced by 0 in <code>make_index</code>). Not used in the clean families.</li>
+<li><code>ethnicity</code> is NA in every wave; <code>params.yml</code> lists it as a control. Not used.</li>
+<li>Upstream exposure columns in the analysis files (<code>exposure_shock_*</code>) are stale relative to any new window; they are dropped on load.</li>
+</ol>
+<h2 id="7-data-dependencies-and-missing-data">7. Data dependencies and missing data</h2>
+<ul>
+<li>Outside the repo: INSEC microdata, court corpus, NRB LG population, <code>lg_master.csv</code>, ward crosswalk (all documented in <code>CLAUDE.md</code>). The clean pipeline reads only the <em>panels</em> already built from them, so it runs from the repository plus the upstream <code>data/clean/</code> tree.</li>
+<li>DHS raw recodes are licensed and git-ignored; the clean pipeline does not need them (it reads the cleaned analysis files, which are themselves committed upstream — see the QA note on history).</li>
+<li>Missing: exchange-rate series (FX shifter), census outcome panel, 2013-stock district fix, DHS variables never extracted (v739 control over earnings, v212 age at first birth, v626 unmet need, d110 injuries, d119 help-seeking, v717 occupation).</li>
+</ul>
+<h2 id="8-minimum-restructuring-done">8. Minimum restructuring done</h2>
+<p>Nothing upstream was moved or edited. A parallel, self-contained <code>clean/</code> tree was added: config-driven share/shifter/instrument builders, one estimation engine shared by both papers, per-paper thin wrappers, a website export with spec IDs and a build hash, a Python static-site builder, docs, a Makefile and a GitHub Actions workflow (at the repository root, the only place GitHub reads workflows). The legacy scripts, dated folders and paper remain the record of the earlier results; the clean results are regenerated and will differ in level from the legacy CSVs because of the default window (2009–2012 vs 2009–2011), the annual-average intensity, the retained 2001 wave and the uniform scaling.</p>
+<h2 id="9-unresolved-specification-choices-kept-as-config-options-defaults-stated">9. Unresolved specification choices (kept as config options, defaults stated)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Choice</th>
+<th>Default</th>
+<th>Alternatives kept</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Share window</td>
+<td>2009–2012</td>
+<td>2012–2015, 2015–2019, 2009–2011 (legacy), 2009–2015, census 2001</td>
+<td><code>config/shares.yml</code></td>
+</tr>
+<tr>
+<td>"2019–2015" window</td>
+<td>interpreted as 2015–2019 (chronological reading; flagged non-predetermined for 2016)</td>
+<td>edit <code>years</code></td>
+<td><code>config/shares.yml</code></td>
+</tr>
+<tr>
+<td>Shifter</td>
+<td>violence: UN VAW index; gender norms: WBL composite</td>
+<td>WBL working-age mean; FX slot not constructed</td>
+<td><code>config/shifters.yml</code></td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>violence: total; gender norms: male+female jointly</td>
+<td>either</td>
+<td><code>config/specifications.yml</code></td>
+</tr>
+<tr>
+<td>Shifter main effect</td>
+<td>always included (design)</td>
+<td>—</td>
+<td>engine</td>
+</tr>
+<tr>
+<td>Intensity scaling</td>
+<td><code>M_rate × W_std</code>, magnitude β × IQR(M)</td>
+<td>z × z scaling <strong>not</strong> offered</td>
+<td><code>config/specifications.yml: exposure</code></td>
+</tr>
+<tr>
+<td>Trends</td>
+<td>region linear trends in Full</td>
+<td>district trends not offered (absorb identifying variation with ≤5 waves)</td>
+<td><code>config/controls.yml</code></td>
+</tr>
+<tr>
+<td>Sample identity across columns</td>
+<td>fixed (complete cases on Full)</td>
+<td>—</td>
+<td>engine</td>
+</tr>
+<tr>
+<td>Admin design</td>
+<td>stacked within unit × year</td>
+<td>level Poisson with offset + province trends</td>
+<td><code>config/specifications.yml</code></td>
+</tr>
+<tr>
+<td>2011 DHS</td>
+<td>excluded for attitude and IPV families</td>
+<td><code>incl_2011</code> sample (flagged not preferred)</td>
+<td><code>config/specifications.yml</code></td>
+</tr>
+<tr>
+<td>2SLS</td>
+<td>offered (husband away) but first stage is weak (F &lt; 1)</td>
+<td>—</td>
+<td>Diagnostics page</td>
+</tr>
+<tr>
+<td>Channel-equality df</td>
+<td>G − 1</td>
+<td>—</td>
+<td>engine</td>
+</tr>
+<tr>
+<td>Weights</td>
+<td>DHS sampling weights; admin unweighted PML</td>
+<td>unweighted DHS</td>
+<td><code>config/specifications.yml</code></td>
+</tr>
+</tbody>
+</table></div>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specification crosswalk: Khanna, Murathanoglu, Theoharides &amp; Yang (2026) → Nepal — Migration, Violence, and Gender Norms in Nepal</title>
+<meta name="description" content="Migration, Violence, and Gender Norms in Nepal">
+<meta name="build-id" content="49f310127da0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/css/site.css">
+</head>
+<body class="">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Migration, Violence, and Gender Norms in Nepal <span class="brand-sub">· documentation</span></a>
+    <nav class="nav" aria-label="Documentation">
+      <a href="../docs/project_audit.html">Audit</a>
+      <a href="../docs/theoharides_specification_crosswalk.html" aria-current="page">Crosswalk</a>
+      <a href="../docs/identification_notes.html">Identification</a>
+      <a href="../docs/dhs_violence_harmonization.html">DHS violence</a>
+      <a href="../docs/data_dictionary.html">Dictionary</a>
+      <a href="../docs/website_schema.html">Schema</a>
+      <a href="../docs/final_qa.html">QA</a>
+      <a class="switch" href="../index.html">Switch paper ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+<article class="prose doc" style="max-width:56rem">
+<h1 id="specification-crosswalk-khanna-murathanoglu-theoharides-yang-2026-nepal">Specification crosswalk: Khanna, Murathanoglu, Theoharides &amp; Yang (2026) → Nepal</h1>
+<p>Reference: Khanna, Murathanoglu, Theoharides and Yang (2026), "Abundance from Abroad:
+Migrant Income and Long-Run Economic Development," <em>AER</em> 116(4): 1540–1577,
+DOI 10.1257/aer.20241465. Replication package: openICPSR 239001 (Stata;
+https://doi.org/10.3886/E239001V1). Inspected version: NBER WP 29862 rev. September 2025
+(the pre-publication text; the typeset AER article and the replication README are
+behind paywalls/Cloudflare and were <strong>not</strong> read — items that could only be confirmed
+there are marked <em>NOT VERIFIED</em>). Secondary reference: Godlonton &amp; Theoharides (2025),
+"Diffusion of Reproductive Health Behavior through International Migration," <em>AER</em>
+115(10), DOI 10.1257/aer.20231286 — the design the existing Nepal pipeline adapts.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Khanna et al. (2026), Philippines</th>
+<th>This project (clean pipeline), Nepal</th>
+<th>Match / deviation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Origin unit <em>i</em></td>
+<td>74 provinces (1990 borders)</td>
+<td>75 districts (pre-2015 scheme; post-2015 splits collapsed)</td>
+<td>same logic</td>
+</tr>
+<tr>
+<td>Destination <em>d</em></td>
+<td>all destination countries in POEA/OWWA contract data</td>
+<td>all permit destinations except India (open border; not in permit system)</td>
+<td>India excluded — documented</td>
+</tr>
+<tr>
+<td>Share / exposure weight</td>
+<td><code>ω_do0</code> = province <em>migrant income</em> from <em>d</em> in 1995 ÷ province population ("exposure weights", do not sum to 1; "incomplete shares")</td>
+<td><code>s_pd</code> = permits to <em>d</em> ÷ all non-India permits in the window (sum to 1), times <code>M_p</code> = annual permits per 1,000 residents</td>
+<td>Ours factor the weight into share × intensity (G&amp;T form); theirs is migrant <em>income</em>, ours permit <em>counts</em> (no contract wages exist for Nepal)</td>
+</tr>
+<tr>
+<td>Base period of shares</td>
+<td>1995 only ("two years before the crisis")</td>
+<td>configurable: 2009–2012 (default), 2012–2015, 2015–2019, 2009–2011, 2009–2015, 2001 census</td>
+<td>Multi-window by requirement; predeterminedness documented per window</td>
+</tr>
+<tr>
+<td>Shifter <em>g_d</em></td>
+<td>proportional change in destination FX vs peso, pre (Jul 96–Jun 97) → post (Sep/Oct 97–Sep/Oct 98); Bloomberg</td>
+<td>WBL composite / WBL working-age / UN VAW policy index, destination × year, lagged 2 years, standardised</td>
+<td><strong>Deviation</strong>: their shock is a one-time financial shock to migrant income; ours is a time-varying norm/policy index (the G&amp;T shifter). No FX series in repo; slot <code>fx_shock</code> kept, status not_constructed</td>
+</tr>
+<tr>
+<td>Instrument / exposure</td>
+<td><code>Shiftshare_o = Σ_d ω_do0 ΔR̃_d = Rshock_o × MigInc_o0</code> (eqs 1–3)</td>
+<td><code>Z_pt = M_p × std[Σ_d s_pd W_{d,t−2}]</code></td>
+<td>same product structure (intensity × weighted shock)</td>
+</tr>
+<tr>
+<td>Endogenous treatment</td>
+<td>none — reduced form is the causal object ("exogenous shares" à la GPSS)</td>
+<td>none by default (reduced form). Optional: <code>husband_is_away</code> instrumented by Z (first stage weak, F&lt;1)</td>
+<td>match (RF default)</td>
+</tr>
+<tr>
+<td>Main equation</td>
+<td><code>y_ot = α_o + γ_t + β Shiftshare_o×Post_t + λ' MigInc_o0×D_t + φ' Rshock_o×D_t + δ' X_o0×Post_t + ε_ot</code> (eq 4)</td>
+<td><code>Y_ipt = β Z_pt + γ W̃_pt + X'θ + α_p + δ_t + ε</code></td>
+<td>Their <code>Rshock_o×D_t</code> = our <code>W̃_pt</code> main effect; their <code>MigInc_o0×D_t</code> is absorbed by our district FE only in the static-M case — <strong>deviation</strong>: we do not interact <code>M_p</code> with year dummies (with 4–5 waves it would absorb much of the identifying variation); flagged as a robustness to add</td>
+</tr>
+<tr>
+<td>Post / timing</td>
+<td>continuous × Post (1997 crisis), event-study by period</td>
+<td>shifter varies annually; no single "post"</td>
+<td>by construction of the shifter</td>
+</tr>
+<tr>
+<td>Controls</td>
+<td>four cumulative panels: (A) 1995 destination-mix and destination-characteristic controls (BHJ-weighted), (B) province development, (C) 1990 industry structure, (D) import/export shift-shares; all × Post</td>
+<td>blocks Minimal / Baseline (individual composition) / Full (+ share-weighted destination GDP, unemployment, female LFP, parliament, fertility, education spending, resource rents, lagged, per channel; + region linear trends)</td>
+<td>Panel A analogue = our destination controls; B–D have no Nepal analogue in the data</td>
+</tr>
+<tr>
+<td>Weights</td>
+<td>none mentioned (unweighted OLS) — <em>NOT VERIFIED</em> in typeset version</td>
+<td>DHS sampling weights (individual data); admin Poisson unweighted</td>
+<td>Individual survey weights are standard for DHS microdata; unweighted option exposed</td>
+</tr>
+<tr>
+<td>Clustering</td>
+<td>province</td>
+<td>district (the exposure level); region and heteroskedastic shown on Diagnostics</td>
+<td>match</td>
+</tr>
+<tr>
+<td>Shock-level inference</td>
+<td>BHJ "exposure-robust" SEs and Conley (200 km) as robustness; no AKM</td>
+<td>not implemented (few distinct destination shocks per year; BHJ SEs need the shock-level regression)</td>
+<td>gap, documented</td>
+</tr>
+<tr>
+<td>Rotemberg weights</td>
+<td>yes (App. B.1): top 5 destinations carry 75%</td>
+<td>destination contribution to Var(Z) and leave-one-destination-out on Diagnostics (Rotemberg weights computed in the legacy <code>mig-vaw-norms/12_rotemberg_weights.R</code>)</td>
+<td>partial match</td>
+</tr>
+<tr>
+<td>Placebos / pre-trends</td>
+<td>event study 1985–2018; placebo "fake post" within 1985–97</td>
+<td>lead-shifter placebo (W_{t+2}); balance of 2001 DHS district means on Z; pre-period waves 2001/2006 inside the panel for attitude and agency families</td>
+<td>analogous</td>
+</tr>
+<tr>
+<td>Destination robustness</td>
+<td>zero-out Malaysia &amp; Korea; top-N destination sets</td>
+<td>drop each of top 8 destinations; alternative windows and shifters</td>
+<td>analogous</td>
+</tr>
+<tr>
+<td>Outcomes</td>
+<td>province income/expenditure, migrant income, education, sector shares</td>
+<td>DHS individual outcomes (violence, agency, fertility, schooling, roles); INSEC and court counts (Poisson)</td>
+<td>different object; estimator adapted to counts</td>
+</tr>
+<tr>
+<td>Replication-package structure</td>
+<td>Stata do-files per table/figure; FRED FX xls; jobsite WDI</td>
+<td>R scripts under <code>clean/analysis/</code>, YAML config, JSON export</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="godlonton-theoharides-2025-the-direct-template">Godlonton &amp; Theoharides (2025) — the direct template</h2>
+<p><code>Y_imt = β0 + β1 MigRate_m0 + β2 LibIndex_{m,t−2} + β3 MigRate_m0 × LibIndex_{m,t−2} + β4 DestShare_m0 + δ_p + τ_t + δ_p·t + ε</code>, with shares in 1992, index lagged two years and standardised, province FE, year FE and province linear trends, province-clustered SEs. Our equation is the same with <code>MigRate_m0</code> absorbed by district FE, <code>LibIndex</code> → WBL/UN-VAW, trends = region linear trends (Full block), clusters = district.</p>
+<h2 id="scaling-rule-adopted-w5-of-the-brief">Scaling rule adopted (W.5 of the brief)</h2>
+<p><code>M_p</code> = annual-average non-India permits per 1,000 residents over the window (so a 7-year window is on the same scale as a 3-year one); <code>W̃</code> standardised across the district × year panel 2001–2026 within window × channel × shifter. Coefficients are per unit of <code>Z</code>; the magnitude <code>β × IQR(M_p)</code> is stored with every estimate and is the quantity to compare across windows.</p>
+</article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Migration, Violence, and Gender Norms in Nepal</span>
+    <span><a href="../docs/final_qa.html" class="muted">version 49f310127da0</a></span>
+  </div>
+</footer>
+<script>window.SITE = {"build": "49f310127da0", "paper": null, "rel": "../"};</script>
+<script src="../shared/js/site.js"></script>
+</body>
+</html>
